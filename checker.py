@@ -21,7 +21,7 @@ class CheckerHandler(webapp2.RequestHandler):
                 
                 for user in all_zh:
                     cur = get_user( user_name=user.user_name )
-                    tc = cur[ 0 ][ 'statuses_count' ]
+                    tc = cur[ 'statuses_count' ]
                     ava = ( float( tc - user.tweet_cnt ) / float( td - user.last_tweet_date ) + user.average_tweet ) / 2.000
                     
                     if ava < AVERAGE_TWEET:

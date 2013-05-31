@@ -12,11 +12,14 @@ ZH_RATE = 0.70
 WAIT_TIME = 60
 
 def temp_user_add( user ):
-    temp_user( key_user_id = user[ 'id' ],
-    user_name = user[ 'screen_name' ], #screen name
-    tweet_cnt = user[ 'statuses_count' ],
-    user_lang = user[ 'lang' ],
-    is_lock = user[ 'protected' ],
+    print user[ 'id' ], user[ 'screen_name' ], user[ 'lang' ]
+    logging.info('Adding a temp user ' + user[ 'screen_name' ] + ' to temp_user')
+    #time.sleep( WAIT_TIME )
+    temp_user( user_id=user[ 'id' ],
+    user_name=user[ 'screen_name' ], #screen name
+    tweet_cnt=user[ 'statuses_count' ],
+    user_lang=user[ 'lang' ],
+    is_lock=user[ 'protected' ],
     ).put()
 
 # get known user screen_name( user_name )
@@ -27,13 +30,15 @@ def init_known_user():
     f = open( abs_path, 'rb' )
     ul = f.readlines()
     f.close()
-    
+    USER_ADDED = False
     for user_name in ul:
         user_name = user_name.replace( '\n', '' )
         user = get_user( user_name=user_name )
         # add user to temp_user
         if user != None:
             temp_user_add( user )
+            USER_ADDED = True
+    return USER_ADDED
 
 #TODO this function should be shorten or refactor
 def zh_user_add( user ):
@@ -67,7 +72,8 @@ class CrawlerHandler(webapp2.RequestHandler):
             # fetch a user from temp_user
             someone = temp_user.all().get()
             if temp_user.all().get() == None: # no one in data
-                init_known_user() # get known user from file
+                if init_known_user() == False: # get known user from file
+                    pass # TODO no user avaliable in given user list
             someone = temp_user.all().get()
             # add user to zh_user
             zh_user_add( someone )
@@ -84,7 +90,7 @@ class CrawlerHandler(webapp2.RequestHandler):
             while cursor != 0:
                 res = get_follow_list( user_name=someone.user_name, page=cursor )
                 for user in res[ 'users' ]:
-                    if ( zh_user_check( user ) == True ) and ( zh_user.gql("WHERE user_id = :1", user[ 'id' ] ) == None ) and ( dead_zh_user.gql("WHERE user_id = :1", user[ 'id' ] ) == None ):
+                    if ( zh_user_checker( user ) == True ) and ( zh_user.gql("WHERE user_id = :1", user[ 'id' ] ) == None ) and ( dead_zh_user.gql("WHERE user_id = :1", user[ 'id' ] ) == None ):
                         temp_user_add( user )
                 cursor = res[ 'next_cursor' ]
                 if cursor == 0:

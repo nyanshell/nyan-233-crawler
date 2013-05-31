@@ -1,0 +1,32 @@
+2013-05-31 19:59:16 
+    * if too much request, need wait some time
+2013-05-31 12:24:11 
+    [DONE]* write checker
+    * debug whole system
+    * repair gql select
+2013-05-30 16:07:19 
+    [DONE]* get user from temp_user
+2013-05-30 01:36:02 
+    [DONE]* detect Chinese character
+    [DONE]* fetch random zh-tweets to find avarege Chinese char rate.
+    [DONE]* after stop restart backend instance
+2013-05-29 13:41:30 
+    [DONE]* fetch one's follower/ foer 
+            (what status will return if locked user? 403 forbidden)
+    [DONE]* get nonuce
+    [DONE]* get signature
+    [DONE]* implement user/lookup
+
+RULES to check zhuser
+    * lang
+    * tweet > 0
+    * bio
+    * name
+    * reply @
+    * zh-tweet > 50%
+    * location
+    * zh-tweet
+    
+STACK
+    [DONE]* backends.yaml add a instance with checker.py to check zh_user
+    [DONE]* tweetunity may need a branch

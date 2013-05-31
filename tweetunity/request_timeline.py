@@ -191,4 +191,4 @@ def get_user(user_id=None, user_name=None ):
 
     connect.close()
 
-    return user_entites
+    return user_entites[ 0 ]
