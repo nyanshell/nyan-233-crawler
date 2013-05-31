@@ -1,0 +1,9 @@
+backends:
+    - name: remilia
+      class: B1
+      instances: 1
+      start: crawler.app
+    - name: flandre
+      class: B1
+      instances: 1
+      start: checker.app
