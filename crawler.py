@@ -12,11 +12,13 @@ ZH_RATE = 0.70
 WAIT_TIME = 60
 
 def temp_user_add( user ):
-    print user[ 'id' ], user[ 'screen_name' ], user[ 'lang' ]
+    if temp_user.gql("WHERE user_id = :1", user[ 'id' ] ) != None:
+        return ;
     logging.info('Adding a temp user ' + user[ 'screen_name' ] + ' to temp_user')
     #time.sleep( WAIT_TIME )
     temp_user( user_id=user[ 'id' ],
     user_name=user[ 'screen_name' ], #screen name
+    user_nick=user[ 'name' ],
     tweet_cnt=user[ 'statuses_count' ],
     user_lang=user[ 'lang' ],
     is_lock=user[ 'protected' ],
@@ -54,26 +56,29 @@ def zh_user_add( user ):
     ).put()
 
 def zh_user_checker( user ):
-    if user[ 'lang' ] == 'zh':
+    if user[ 'lang' ] == 'zh-cn':
         return True
-    elif user[ 'pretected' ] == True:
+    elif user[ 'statuses_count' ] < 50:
+        return False
+    elif user[ 'protected' ] == True:
         if zhdetect( user[ 'description' ] ) >= ZH_RATE:
             return True
         # search if someone mention him
-        res = search_keyword(user['screen_name'],count=50)
+        res = search_keyword( user['screen_name'], count=50)
+        if res == None:
+            return False
         return zhdetect_multi( res )
     else:
-        res = get_tweets( user[ 'screen_name' ], 50 )
+        res = get_tweets( user[ 'screen_name' ], count=50 )
         return zhdetect_multi( res )
 
 class CrawlerHandler(webapp2.RequestHandler):
     def get(self):
         while True: # TODO need add some wait time
-            # fetch a user from temp_user
-            someone = temp_user.all().get()
             if temp_user.all().get() == None: # no one in data
                 if init_known_user() == False: # get known user from file
                     pass # TODO no user avaliable in given user list
+            # fetch a user from temp_user
             someone = temp_user.all().get()
             # add user to zh_user
             zh_user_add( someone )
@@ -89,17 +94,22 @@ class CrawlerHandler(webapp2.RequestHandler):
             cursor = -1
             while cursor != 0:
                 res = get_follow_list( user_name=someone.user_name, page=cursor )
-                for user in res[ 'users' ]:
-                    if ( zh_user_checker( user ) == True ) and ( zh_user.gql("WHERE user_id = :1", user[ 'id' ] ) == None ) and ( dead_zh_user.gql("WHERE user_id = :1", user[ 'id' ] ) == None ):
-                        temp_user_add( user )
-                cursor = res[ 'next_cursor' ]
-                if cursor == 0:
+                if res == None:
                     break
-                #TODO if request limit exceed, wait?
+                    pass # TODO wait for some time
+                else:
+                    for user in res[ 'users' ]:
+                        if ( dead_zh_user.gql("WHERE user_id = :1", user[ 'id' ] ) != None ) or ( zh_user.gql("WHERE user_id = :1", user[ 'id' ] ) != None ):
+                            continue
+                        if zh_user_checker( user ) == True:
+                            temp_user_add( user )
+                    cursor = res[ 'next_cursor' ]
+                    if cursor == 0:
+                        break
 
             # delete user from temp_user
-            temp_user.delete( someone.user_id )
-            temp_user.put()
+            temp_user.delete( someone )
+            #temp_user.put() seems can't do this if need delete
 
 app = webapp2.WSGIApplication([('/_ah/start', CrawlerHandler)], debug=True)
 

@@ -18,7 +18,8 @@ class CheckerHandler(webapp2.RequestHandler):
                 all_zh = zh_user.gql("WHERE last_tweet_date < :1 ", td - datetime.timedelta( 7 ) ).run()
                 
                 count = Count.all().get()
-                
+                print all_zh.count()
+                time.sleep( 60 )
                 for user in all_zh:
                     cur = get_user( user_name=user.user_name )
                     tc = cur[ 'statuses_count' ]
@@ -35,6 +36,6 @@ class CheckerHandler(webapp2.RequestHandler):
                         user.put()
                 count.put()
             time.sleep( SLEEP_TIME )
-
-app = webapp2.WSGIApplication([('/_ah/start', CheckerHandler)], debug=True)
+#_ah/start
+app = webapp2.WSGIApplication([('/', CheckerHandler)], debug=True)
 

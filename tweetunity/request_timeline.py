@@ -12,11 +12,11 @@ from obtain_oauth import get_oauth_header
 from gzip_decode import gzip_decode
 
 # API : GET follower/list
-def get_tweets( user_name, cnt_num ):
+def get_tweets( user_name, count ):
     access_token = get_access_token()
     #TODO raise a GetTweetError here
     host = 'api.twitter.com'
-    url = '/1.1/statuses/user_timeline.json?count=' + str(cnt_num) + '&screen_name=' + user_name
+    url = '/1.1/statuses/user_timeline.json?count=' + str(count) + '&screen_name=' + user_name
 
     connect = httplib.HTTPSConnection( host )
     #write headers
@@ -191,4 +191,4 @@ def get_user(user_id=None, user_name=None ):
 
     connect.close()
 
-    return user_entites[ 0 ]
+    return user_entites[ 0 ] # only return user

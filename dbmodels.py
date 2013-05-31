@@ -5,6 +5,7 @@ from google.appengine.ext import db
 class temp_user(db.Model):
     user_id = db.IntegerProperty()
     user_name = db.StringProperty() #screen name
+    user_nick = db.StringProperty()
     last_tweet_date = db.DateProperty(auto_now_add=True)
     tweet_cnt = db.IntegerProperty()
     user_lang = db.StringProperty()
