@@ -3,18 +3,14 @@
 <html>
   <head>
     <link type="text/css" rel="stylesheet" href="/stylesheets/main.css" />
-      <title>Nyan~</title>
+      <title>Nyan Crawler Results~</title>
   </head>
   <body>
 
 </ul>
-    {% if word %}
-        post:
-    {% endif %}
-    <!-- display words -->
-    {% for word in words %}
-        <div class="comment" >{{ word.word|escape }} {{word.count|escape }}</div>
-    {% endfor %}
+    {{ zh_users_active + zh_users_dead }} users currently recorded, {{ zh_users_acitive}} users
+    active.
+    Crwawler start from {{ count_start_date }}
     <!-- Sign and date the page, it's only polite! -->
     <address>2013-05-29 09:22:59 <br>
     by Baklava for test using</br></address>
