@@ -77,7 +77,8 @@ class CrawlerHandler(webapp2.RequestHandler):
         while True: # TODO need add some wait time
             if temp_user.all().get() == None: # no one in data
                 if init_known_user() == False: # get known user from file
-                    pass # TODO no user avaliable in given user list
+                    logging.error('No known users, application should exit.')
+                    pass # TODO no user avaliable in given user list, exit
             # fetch a user from temp_user
             someone = temp_user.all().get()
             # add user to zh_user
@@ -99,7 +100,7 @@ class CrawlerHandler(webapp2.RequestHandler):
                     pass # TODO wait for some time
                 else:
                     for user in res[ 'users' ]:
-                        if ( dead_zh_user.gql("WHERE user_id = :1", user[ 'id' ] ) != None ) or ( zh_user.gql("WHERE user_id = :1", user[ 'id' ] ) != None ):
+                        if ( dead_zh_user.gql("WHERE user_id = :1", user[ 'id' ] ) != None ) or ( zh_user.gql("WHERE user_id = :1", user[ 'id' ] ) != None ): # check repeat
                             continue
                         if zh_user_checker( user ) == True:
                             temp_user_add( user )

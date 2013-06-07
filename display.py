@@ -15,10 +15,10 @@
 # limitations under the License.
 #
 import webapp2
-import dbmodels
 import jinja2
 import os
-from dbmodels import zh_user, temp_user, dead_zh_user, Count
+#from dbmodels import zh_user, temp_user, dead_zh_user, Count
+from dbmodels import Count
 from google.appengine.ext import db
 
 JINJA_ENVIRONMENT = jinja2.Environment(
@@ -26,13 +26,16 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
+    
+        count = Count.all().get()
+    
         template_values = {
-            'zh_users_acitve': Count.user_active,
+            'zh_users_active': count.user_active,
             'zh_users_dead': count.user_dead,
-            'count_start_date': count_start_date,
+            'count_start_date': count.count_start_date,
         }
 
-        template = JINJA_ENVIRONMENT.get_template('show_tweet.html')
+        template = JINJA_ENVIRONMENT.get_template('index.html')
         self.response.write(template.render(template_values))
     
 app = webapp2.WSGIApplication([('/', MainHandler)], debug=True)
