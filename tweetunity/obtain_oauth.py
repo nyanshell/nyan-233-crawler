@@ -55,23 +55,33 @@ oauth_version="1.0"
 steps from here:
 https://dev.twitter.com/docs/auth/creating-signature
 """
-def get_oauth_header( http_method, host, url, body="" ):
+def get_oauth_header( http_method, host, url, opt, body="" ):
     consumer_key, consumer_secret, access_token, access_token_secret = get_consumer_token(True)
     
     nonce = get_nonce()
     timestamp = str( int( time.time() ) )
+    
+    # for test
+    #nonce = "33433067d8aec443f64ae6ae4040c693"
+    #timestamp = "1371730474"
     sign_key = consumer_secret + "&" + access_token_secret
 
     #notice: options in url didn't included in parameter string here
-    parameter_string = "oauth_consumer_key=" + consumer_key + "&oauth_nonce=" + nonce + "&oauth_signature_method=HMAC-SHA1&oauth_timestamp=" + timestamp + "&oauth_token=" + access_token +"&oauth_version=1.0&" + urllib.quote( body, '')
+    parameter_string = opt + "&oauth_consumer_key=" + consumer_key + "&oauth_nonce=" + nonce + "&oauth_signature_method=HMAC-SHA1&oauth_timestamp=" + timestamp + "&oauth_token=" + access_token +"&oauth_version=1.0&" + body
 
-    base_string = http_method + "&" + urllib.quote( host + url, '' ) + "&" + parameter_string 
-
+    base_string = http_method + "&" + urllib.quote( 'https://' + host + url, '' ) + "&" + urllib.quote( parameter_string, '') 
+    
+    #print base_string
+    
     hashed = hmac.new( sign_key, base_string, sha1 )
 
-    signature = binascii.b2a_base64( hashed.digest() )[ : -1 ]# delete '\n' 
+    signature = urllib.quote( binascii.b2a_base64( hashed.digest() )[ : -1 ], '' )# delete '\n' 
 
-    oauth_header = 'OAuth oauth_consumer_key="' + consumer_key + '",oauth_nonce="' + nonce + '", oauth_signature="' + signature + '", oauth_signature_method="HMAC-SHA1",oauth_timestamp="' + timestamp + '",oauth_token="' + access_token + '",oauth_version="1.0"'
+    #print signature
+
+    oauth_header = 'OAuth oauth_consumer_key="' + consumer_key + '", oauth_nonce="' + nonce + '", oauth_signature="' + signature + '", oauth_signature_method="HMAC-SHA1", oauth_timestamp="' + timestamp + '", oauth_token="' + access_token + '", oauth_version="1.0"'
+
+    #print oauth_header
 
     return oauth_header
 
@@ -123,6 +133,7 @@ def obtain_bearer_token( consumer_key, consumer_secret ):
 def get_nonce():
     s = ""
     for i in range( 0 , 32 ):
-        t = random.randint( 65, 90 )
+        t = random.randint( 97, 122 )
         s = s + chr( t )
-    return base64.b64encode( s )
+    return s
+    #return base64.b64encode( s )

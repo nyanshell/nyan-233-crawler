@@ -12,7 +12,9 @@ ZH_RATE = 0.70
 WAIT_TIME = 60
 
 def temp_user_add( user ):
-    if temp_user.gql("WHERE user_id = :1", user[ 'id' ] ) != None:
+    #print user.__class__
+    #print user[ 'id' ]
+    if temp_user.gql("WHERE user_id = :1", user[ 'id' ] ).get() != None:
         return ;
     logging.info('Adding a temp user ' + user[ 'screen_name' ] + ' to temp_user')
     #time.sleep( WAIT_TIME )
@@ -37,9 +39,11 @@ def init_known_user():
         user_name = user_name.replace( '\n', '' )
         user = get_user( user_name=user_name )
         # add user to temp_user
-        if user != None:
+        if isinstance( user, dict ) == True:
             temp_user_add( user )
             USER_ADDED = True
+        else:
+            logging.error('Something goes wrong, Cannot get user.')
     return USER_ADDED
 
 #TODO this function should be shorten or refactor
@@ -78,7 +82,7 @@ class CrawlerHandler(webapp2.RequestHandler):
             if temp_user.all().get() == None: # no one in data
                 if init_known_user() == False: # get known user from file
                     logging.error('No known users, application should exit.')
-                    pass # TODO no user avaliable in given user list, exit
+                    # TODO no user avaliable in given user list, exit
             # fetch a user from temp_user
             someone = temp_user.all().get()
             # add user to zh_user

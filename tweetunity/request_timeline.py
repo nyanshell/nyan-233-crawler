@@ -162,16 +162,17 @@ def get_user(user_id=None, user_name=None ):
         return "user_id and user_name can't be used at same time"
 
     host = 'api.twitter.com'
+    url = '/1.1/users/lookup.json'
     if user_name != None:
-        url = '/1/users/lookup.json?screen_name=' + user_name + '&include_entities=true'
+        opt = 'screen_name=' + user_name
     else:
-        url = '/1/users/lookup.json?user_id=' + str( user_id ) + '&include_entities=true'
+        opt = 'user_id=' + str( user_id ) 
 
-    oauth_header = get_oauth_header( "GET", host, url )
+    oauth_header = get_oauth_header( "GET", host, url, 'include_entities=true', opt )
 
     connect = httplib.HTTPSConnection( host )
     #write headers
-    connect.putrequest("GET", url )
+    connect.putrequest("GET", url + '?' + opt + '&include_entities=true')
     connect.putheader("Host", host )
     connect.putheader("User-Agent", "Scarlet Poppy Anarchistic")
     connect.putheader("Authorization", oauth_header )   
@@ -183,12 +184,12 @@ def get_user(user_id=None, user_name=None ):
     # Check that everything went ok.
     if twitter_response.status != 200:
         print "Failed to request tweets, code " + str(twitter_response.status)
-        return "Failed to request tweets, code " + str(twitter_response.status)
+        #return "Failed to request tweets, code " + str(twitter_response.status)
 
     zipped_tweets = twitter_response.read()
-
+    print len(zipped_tweets)
     user_entites = gzip_decode( zipped_tweets )
-
+    print user_entites
     connect.close()
 
     return user_entites[ 0 ] # only return user
