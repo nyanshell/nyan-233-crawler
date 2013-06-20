@@ -17,9 +17,9 @@ USAGE
 
   * put known_users.txt in app folder, add some known users in it( one user per line )
   
-  * put oauth keys in /tweetunity folder
+  * put oauth keys in /tweetunity/oauth_keys.txt
 
 _Gestalt Lur_
 
-_last update: 2013-06-07 21:20:29_
+_last update: 2013-06-20 22:49:45_
 

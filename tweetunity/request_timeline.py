@@ -65,8 +65,11 @@ def get_follow_list( user_id=None, user_name=None, page=-1 ):
     connect.endheaders()
 
     twitter_response = connect.getresponse()
-    print twitter_response.status
-
+    # if can't get follower list, return a status code
+    if twitter_response.status != 200:
+        logging.warning('Can\'t get follower list')
+        return twitter_response.status
+        
     zipped_tweets = twitter_response.read()
 
     follower_entites = gzip_decode( zipped_tweets )
@@ -187,9 +190,9 @@ def get_user(user_id=None, user_name=None ):
         #return "Failed to request tweets, code " + str(twitter_response.status)
 
     zipped_tweets = twitter_response.read()
-    print len(zipped_tweets)
+    #print len(zipped_tweets)
     user_entites = gzip_decode( zipped_tweets )
-    print user_entites
+    #print user_entites
     connect.close()
 
     return user_entites[ 0 ] # only return user

@@ -12,9 +12,6 @@ handlers:
 - url: /stylesheets
   static_dir: stylesheets
 
-- url: /_ah/start
-  script: crawler.app
-
 - url: .*
   script: display.app
 

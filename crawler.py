@@ -79,7 +79,7 @@ def zh_user_checker( user ):
 class CrawlerHandler(webapp2.RequestHandler):
     def get(self):
         while True: # TODO need add some wait time
-            if temp_user.all().get() == None: # no one in data
+            if temp_user.all().get() == None: # no user in data
                 if init_known_user() == False: # get known user from file
                     logging.error('No known users, application should exit.')
                     # TODO no user avaliable in given user list, exit
@@ -99,14 +99,21 @@ class CrawlerHandler(webapp2.RequestHandler):
             cursor = -1
             while cursor != 0:
                 res = get_follow_list( user_name=someone.user_name, page=cursor )
-                if res == None:
+                if isinstance( res, int ) == True:
                     break
-                    pass # TODO wait for some time
+                    pass # TODO should wait for some time
                 else:
                     for user in res[ 'users' ]:
-                        if ( dead_zh_user.gql("WHERE user_id = :1", user[ 'id' ] ) != None ) or ( zh_user.gql("WHERE user_id = :1", user[ 'id' ] ) != None ): # check repeat
+                        # test
+                        print user[ 'screen_name' ]
+                        #print ( dead_zh_user.gql("WHERE user_id = :1", user[ 'id' ] ) != None )
+                        #print ( zh_user.gql("WHERE user_id = :1", user[ 'id' ] ) != None )
+                        time.sleep( 5 )
+                        if ( dead_zh_user.gql("WHERE user_id = :1", user[ 'id' ] ) != None ) != True or ( zh_user.gql("WHERE user_id = :1", user[ 'id' ] ) != None ) != True : # check repeat
+                            print 'user already found'# test
                             continue
                         if zh_user_checker( user ) == True:
+                            print 'temp zh user added'
                             temp_user_add( user )
                     cursor = res[ 'next_cursor' ]
                     if cursor == 0:
