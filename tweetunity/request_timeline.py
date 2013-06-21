@@ -6,6 +6,7 @@ Gestalt Lur
 import httplib
 import urllib
 import os
+import logging
 
 from obtain_oauth import get_access_token
 from obtain_oauth import get_oauth_header 

@@ -48,10 +48,12 @@ def init_known_user():
 
 #TODO this function should be shorten or refactor
 def zh_user_add( user ):
-    if not isinstance( user, temp_user ):
-        logging.error('user to be add not belong temp_user')
+    if not isinstance( user, temp_user ): #ensure not add empty type
+        logging.warning('user to be add not belong temp_user')
         return
-        
+    elif zh_user.gql("WHERE user_id = :1", user.user_id ).get() != None:
+        logging.info( 'user' + user.user_name + ' already exist.')        
+        return
     zh_user( key_user_id = user.user_id,
     user_name = user.user_name, #screen name
     tweet_cnt = user.tweet_cnt,
@@ -60,7 +62,7 @@ def zh_user_add( user ):
     ).put()
 
 def zh_user_checker( user ):
-    if user[ 'lang' ] == 'zh-cn':
+    if (user[ 'lang' ] == 'zh-cn') and (user[ 'statuses_count' ] > 0 ):
         return True
     elif user[ 'statuses_count' ] < 50:
         return False
@@ -99,21 +101,16 @@ class CrawlerHandler(webapp2.RequestHandler):
             cursor = -1
             while cursor != 0:
                 res = get_follow_list( user_name=someone.user_name, page=cursor )
-                if isinstance( res, int ) == True:
+                if isinstance( res, dict ) == False: # if can't get user list correctly, return value must be long or integer
+                    logging.warning( 'status code ' + str( res ) + ', wait 1 minutes to continue')
+                    time.sleep( 3600 )
                     break
-                    pass # TODO should wait for some time
                 else:
                     for user in res[ 'users' ]:
-                        # test
-                        print user[ 'screen_name' ]
-                        #print ( dead_zh_user.gql("WHERE user_id = :1", user[ 'id' ] ) != None )
-                        #print ( zh_user.gql("WHERE user_id = :1", user[ 'id' ] ) != None )
-                        time.sleep( 5 )
-                        if ( dead_zh_user.gql("WHERE user_id = :1", user[ 'id' ] ) != None ) != True or ( zh_user.gql("WHERE user_id = :1", user[ 'id' ] ) != None ) != True : # check repeat
-                            print 'user already found'# test
+                        logging.info( 'found ' + user[ 'screen_name' ] )
+                        if ( dead_zh_user.gql("WHERE user_id = :1", user[ 'id' ] ).get() != None ) or ( zh_user.gql("WHERE user_id = :1", user[ 'id' ] ).get() != None ): # check duplicate
                             continue
                         if zh_user_checker( user ) == True:
-                            print 'temp zh user added'
                             temp_user_add( user )
                     cursor = res[ 'next_cursor' ]
                     if cursor == 0:

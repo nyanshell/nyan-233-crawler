@@ -8,7 +8,7 @@ FEATURES
 
   1. Detect both active user & inactive user
   
-  2. Could detect protected user( if active & have interaction with other )
+  2. Could detect protected user( if they're active & have interaction with other )
     
   3. use a more accurate method in language detect
   
@@ -21,5 +21,5 @@ USAGE
 
 _Gestalt Lur_
 
-_last update: 2013-06-20 22:49:45_
+_last update: 2013-06-21 14:45:41_
 

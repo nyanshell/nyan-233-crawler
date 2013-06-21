@@ -1,3 +1,6 @@
+2013-06-21 14:46:13 
+    * zh_user db seems buggy, need fix
+    * temp_user db number count display
 2013-06-07 21:17:48 
     * get user's friend list
 2013-06-01 02:23:19 
@@ -22,7 +25,8 @@
     [DONE]* implement user/lookup
     
 STACK
-    * if too much request, need wait some time
+    * make a graph to display tweets statics on frontend
+    [DONE]* if too much request, need wait some time
     [DONE]* backends.yaml add a instance with checker.py to check zh_user
     [DONE]* tweetunity may need a branch
 
